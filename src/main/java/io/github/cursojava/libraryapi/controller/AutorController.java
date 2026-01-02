@@ -24,19 +24,18 @@ import io.github.cursojava.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.cursojava.libraryapi.exceptions.RegistroDuplicadoException;
 import io.github.cursojava.libraryapi.model.Autor;
 import io.github.cursojava.libraryapi.service.AutorService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("autores")
-// http://localhost:8080/autores/
+@RequiredArgsConstructor
 public class AutorController {
 
     private final AutorService service;
 
-    public AutorController(AutorService service){
-        this.service = service;
-    }
-
-    public ResponseEntity<Object> salvar(@RequestBody AutorDTO autor){
+    @PostMapping
+    public ResponseEntity<Object> salvar(@RequestBody @Valid AutorDTO autor){
         try {
             Autor autorEntidade = autor.mapearParaAutor();
             service.salvar(autorEntidade);
@@ -96,7 +95,7 @@ public class AutorController {
     public ResponseEntity<List<AutorDTO>> pesquisar(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "nacionalidade", required = false) String nacionalidade){
-        List<Autor> resultado = service.pesquisa(nome, nacionalidade);
+        List<Autor> resultado = service.pesquisaByExample(nome, nacionalidade);
         List<AutorDTO> lista = resultado
                 .stream()
                 .map(autor -> new AutorDTO(
@@ -111,7 +110,7 @@ public class AutorController {
 
     @PutMapping("{id}")
     public ResponseEntity<Object> atualizar(
-            @PathVariable("id") String id, @RequestBody AutorDTO dto){
+            @PathVariable("id") String id, @RequestBody @Valid AutorDTO dto){
 
         try {
 
