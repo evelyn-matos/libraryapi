@@ -36,7 +36,7 @@ class LivroRepositoryTest {
                 .findById(UUID.fromString("76e7c418-ccf9-4e2a-af20-c28b9e50ab55"))
                 .orElse(null);
 
-        //        livro.setAutor(autor);
+               livro.setAutor(autor);
 
         repository.save(livro);
     }
