@@ -1,13 +1,16 @@
 package io.github.cursojava.libraryapi.controller.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import io.github.cursojava.libraryapi.model.Autor;
 
 public record AutorDTO(
+        UUID id,
         String nome,
         LocalDate dataNascimento,
-        String nacionalidade) {
+        String nacionalidade
+    ) {
 
 
     public Autor mapearParaAutor(){
