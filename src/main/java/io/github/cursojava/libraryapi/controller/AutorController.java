@@ -32,7 +32,7 @@ public class AutorController implements GenericController {
     private final AutorMapper mapper;
 
     @PostMapping
-    public ResponseEntity<Void> salvar(@RequestBody @Valid AutorDTO dto){
+    public ResponseEntity<Void> salvar(@RequestBody AutorDTO dto){
  
         Autor autor = mapper.toEntity(dto);
         service.salvar(autor);

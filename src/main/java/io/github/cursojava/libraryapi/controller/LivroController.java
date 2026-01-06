@@ -2,12 +2,11 @@ package io.github.cursojava.libraryapi.controller;
 
 
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,8 +41,8 @@ public class LivroController implements GenericController{
         return ResponseEntity.created(url).build();
     }
 
-     public ResponseEntity<ResponsePesquisaLivroDTO> obterDetalhes(
-            @PathVariable("id") String id){
+    @GetMapping("{id}")
+    public ResponseEntity<ResponsePesquisaLivroDTO> obterDetalhes(@PathVariable("id") String id){
         return service.obterPorId(UUID.fromString(id))
                 .map(livro -> {
                     var dto = mapper.toDTO(livro);
@@ -51,7 +50,8 @@ public class LivroController implements GenericController{
                 }).orElseGet( () -> ResponseEntity.notFound().build() );
     }
 
-        public ResponseEntity<Object> deletar(@PathVariable("id") String id){
+    @DeleteMapping("{id}")
+    public ResponseEntity<Object> deletar(@PathVariable("id") String id){
         return service.obterPorId(UUID.fromString(id))
                 .map(livro -> {
                     service.deletar(livro);
@@ -84,7 +84,7 @@ public class LivroController implements GenericController{
         return ResponseEntity.ok(resultado);
     }
 
-     @PutMapping("{id}")
+    @PutMapping("{id}")
     public ResponseEntity<Object> atualizar(
             @PathVariable("id") String id, @RequestBody @Valid CadastroLivroDTO dto){
         return service.obterPorId(UUID.fromString(id))

@@ -27,6 +27,10 @@ public class AutorValidator {
                 autor.getNome(), autor.getDataNascimento(), autor.getNacionalidade()
         );
 
+        if (autorEncontrado.isEmpty()) {
+            return false;
+        }
+
         if(autor.getId() == null){
             return autorEncontrado.isPresent() ;
         }
