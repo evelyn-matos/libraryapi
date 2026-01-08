@@ -3,7 +3,6 @@ package io.github.cursojava.libraryapi.service;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import io.github.cursojava.libraryapi.enums.GeneroLivro;
 import io.github.cursojava.libraryapi.model.Livro;
+import io.github.cursojava.libraryapi.model.Usuario;
 import io.github.cursojava.libraryapi.repository.LivroRepository;
+import io.github.cursojava.libraryapi.security.SecurityService;
 import io.github.cursojava.libraryapi.validator.LivroValidator;
 import lombok.RequiredArgsConstructor;
 import static io.github.cursojava.libraryapi.repository.specs.LivroSpecs.*;
@@ -23,9 +24,12 @@ public class LivroService {
 
     private final LivroRepository repository;
     private final LivroValidator validator;
+    private final SecurityService securityService;
 
        public Livro salvar(Livro livro) {
         validator.validar(livro);
+        Usuario user = securityService.obterUsuarioLogado();
+        livro.setUsuario(user);
         return repository.save(livro);
     }
 
