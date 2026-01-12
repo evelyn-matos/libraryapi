@@ -9,12 +9,14 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import io.github.cursojava.libraryapi.security.CustomUserDetailsService;
+import io.github.cursojava.libraryapi.security.LoginSocialSucessHandler;
 import io.github.cursojava.libraryapi.service.UsuarioService;
 
 @Configuration
@@ -23,7 +25,7 @@ import io.github.cursojava.libraryapi.service.UsuarioService;
 public class SecurityConfiguration {
     
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSucessHandler sucessHandler) throws Exception {
           return http
                   .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
@@ -35,6 +37,12 @@ public class SecurityConfiguration {
                     authorize.requestMatchers(HttpMethod.POST, "/usuarios/**").permitAll();
                     authorize.anyRequest().authenticated();
                      })
+                .oauth2Login(oauth2 -> {
+                    
+                    oauth2
+                    .loginPage("/login")
+                    .successHandler(sucessHandler);
+                })
                 .build();
     }
 
@@ -45,7 +53,7 @@ public class SecurityConfiguration {
     }
 
 
-    @Bean
+    //@Bean (usando o customAuthentication)
     public UserDetailsService userDetailsService(UsuarioService usuarioService){
 
         // UserDetails user1 = User.builder()
@@ -63,6 +71,11 @@ public class SecurityConfiguration {
 
         return new CustomUserDetailsService(usuarioService);
     } 
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults(){
+        return new GrantedAuthorityDefaults("");
+    }
 }
 
 

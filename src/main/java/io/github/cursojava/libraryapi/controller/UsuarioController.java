@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import io.github.cursojava.libraryapi.controller.dto.UsuarioDTO;
 import io.github.cursojava.libraryapi.controller.mappers.UsuarioMapper;
 import io.github.cursojava.libraryapi.service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,7 +22,7 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void salvar(@RequestBody UsuarioDTO dto){
+    public void salvar(@RequestBody @Valid UsuarioDTO dto){
         var usuario = mapper.toEntity(dto);
         service.salvar(usuario);
     }
