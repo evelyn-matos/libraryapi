@@ -13,9 +13,14 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import io.github.cursojava.libraryapi.security.CustomUserDetailsService;
+import io.github.cursojava.libraryapi.security.JwtCustomAuthenticationFilter;
 import io.github.cursojava.libraryapi.security.LoginSocialSucessHandler;
 import io.github.cursojava.libraryapi.service.UsuarioService;
 
@@ -25,7 +30,7 @@ import io.github.cursojava.libraryapi.service.UsuarioService;
 public class SecurityConfiguration {
     
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSucessHandler sucessHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSucessHandler sucessHandler, JwtCustomAuthenticationFilter jwtCustomAuthenticationFilter) throws Exception {
           return http
                   .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
@@ -43,38 +48,27 @@ public class SecurityConfiguration {
                     .loginPage("/login")
                     .successHandler(sucessHandler);
                 })
+                .oauth2ResourceServer(oauth2RS -> oauth2RS.jwt(Customizer.withDefaults()))
+                .addFilterAfter(jwtCustomAuthenticationFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
-    //Implementação de segurança , criptografia de senha
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
-
-    //@Bean (usando o customAuthentication)
-    public UserDetailsService userDetailsService(UsuarioService usuarioService){
-
-        // UserDetails user1 = User.builder()
-        //     .username("usuario")
-        //     .password(encoder.encode("12334"))
-        //     .roles("USER")
-        //     .build();
-
-        // UserDetails user2 = User.builder()
-        //     .username("admin")
-        //     .password(encoder.encode("532544"))
-        //     .roles("ADMIN")
-        //     .build();
-
-
-        return new CustomUserDetailsService(usuarioService);
-    } 
-
+    // configura o prefixo role
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults(){
         return new GrantedAuthorityDefaults("");
+    }
+
+    //Configura no token jwt o prefixo scope
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+        var authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("");
+
+        var converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+        return converter;
     }
 }
 
